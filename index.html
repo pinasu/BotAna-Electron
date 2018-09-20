@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+  <html>
+	<head>
+	  <meta charset="utf-8">
+	  <title>BotAna</title>
+	</head>
+	<body>
+
+	  <div class="button-list">
+		<button class="connect btn">Connect to chat</button>
+		<button class="disconnect btn">Disconnect from chat</button>
+	  </div>
+
+	  <script src="botAna.js"></script>
+
+	  <script>window.$ = window.jQuery = require('jquery');</script>
+
+	  <script>
+	  $(document).ready(function(){
+		$('.connect').click(function(){
+		  window.botAna.open();
+		});
+		$('.disconnect').click(function(){
+		  window.botAna.close();
+		});
+	  });
+
+	  window.botAna = new botAna({
+		channel: '#pinasu',
+		username: 'botana__',
+		password: 'oauth:zsfjnrh0k134su0gt4zd6esk47zdsq',
+	  });
+	  </script>
+
+	</body>
+  </html>
