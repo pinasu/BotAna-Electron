@@ -25,10 +25,12 @@
 		});
 	  });
 
+	  var CONFIG = require('./config.json');
+
 	  window.botAna = new botAna({
-		channel: '#pinasu',
-		username: 'botana__',
-		password: 'oauth:zsfjnrh0k134su0gt4zd6esk47zdsq',
+		  channel : "#"+CONFIG.nick,
+		  username : CONFIG.bot_name,
+		  password : CONFIG.bot_oauth
 	  });
 	  </script>
 
