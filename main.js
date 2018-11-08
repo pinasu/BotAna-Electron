@@ -1,13 +1,25 @@
-const { app, BrowserWindow } = require('electron')
+const {
+	app,
+	BrowserWindow
+} = require('electron')
 
 let win
 
-function createWindow () {
-	win = new BrowserWindow({ width: 800, height: 600 })
+function createWindow() {
+	win = new BrowserWindow({
+		width: 800,
+		height: 600,
+		webPreferences: false
+	})
+
+	//Opens Developer Tools
+	win.webContents.openDevTools()
+
+	win.setMenu(null)
 
 	win.loadFile('index.html')
 
-	win.on('closed', () =>{
+	win.on('closed', () => {
 		win = null
 	})
 }
@@ -25,6 +37,3 @@ app.on('activate', () => {
 		createWindow()
 	}
 })
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.

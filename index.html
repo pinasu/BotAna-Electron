@@ -1,38 +1,49 @@
 <!DOCTYPE html>
-  <html>
-	<head>
-	  <meta charset="utf-8">
-	  <title>BotAna</title>
-	</head>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<script src="botAna.js"></script>
+
+	<script>
+		window.$ = window.jQuery = require('jquery');
+	</script>
+
+	<!-- My CSS -->
+	<link rel="stylesheet" type="text/css" href="style.css"/>
+
+	<!-- Bootstrap -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+	<title>BotAna</title>
+</head>
+
 	<body>
-
-	  <div class="button-list">
-		<button class="connect btn">Connect to chat</button>
+	<div id="message_window"></div>
+	<div class="button-list">
 		<button class="disconnect btn">Disconnect from chat</button>
-	  </div>
+	</div>
 
-	  <script src="botAna.js"></script>
-
-	  <script>window.$ = window.jQuery = require('jquery');</script>
-
-	  <script>
-	  $(document).ready(function(){
-		$('.connect').click(function(){
-		  window.botAna.open();
+	<script>
+		$(document).ready(function() {
+			window.botAna.open();
+			$(".disconnect").click(function() {
+				window.botAna.close();
+			});
 		});
-		$('.disconnect').click(function(){
-		  window.botAna.close();
+
+		var CONFIG = require('./config.json');
+
+		window.botAna = new botAna({
+			channel: "#" + CONFIG.nick,
+			username: '' + CONFIG.bot_name,
+			password: '' + CONFIG.bot_oauth,
+			client_id: '' + CONFIG.client_id
 		});
-	  });
+	</script>
 
-	  var CONFIG = require('./config.json');
+</body>
 
-	  window.botAna = new botAna({
-		  channel : "#"+CONFIG.nick,
-		  username : CONFIG.bot_name,
-		  password : CONFIG.bot_oauth
-	  });
-	  </script>
-
-	</body>
-  </html>
+</html>

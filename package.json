@@ -1,17 +1,17 @@
 {
- "name": "test_botanajs",
- "version": "1.0.0",
- "description": "Pinasu's Twitch chatbot",
- "main": "main.js",
- "scripts": {
-  "start": "electron ."
- },
- "author": "Pinasu",
- "license": "ISC",
- "devDependencies": {
-  "electron": "^3.0.0"
- },
- "dependencies": {
-  "jquery": "^3.3.1"
- }
+	"name": "test_botanajs",
+	"version": "1.0.0",
+	"description": "Pinasu's Twitch chatbot",
+	"main": "main.js",
+	"scripts": {
+		"start": "electron ."
+	},
+	"author": "Pinasu",
+	"license": "ISC",
+	"devDependencies": {
+		"electron": "^3.0.0"
+	},
+	"dependencies": {
+		"jquery": "^3.3.1"
+	}
 }
