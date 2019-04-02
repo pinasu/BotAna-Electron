@@ -18,6 +18,7 @@ var botAna = function botAna(options) {
 	this.password = options.password;
 	this.channel = options.channel;
 	this.client_id = options.client_id;
+	this.client_secret = options.client_secret;
 
 	this.server = 'irc-ws.chat.twitch.tv';
 	this.port = 443;
@@ -31,19 +32,13 @@ botAna.prototype.open = function open() {
 	this.webSocket.onclose = this.onClose.bind(this);
 	this.webSocket.onopen = this.onOpen.bind(this);
 
-	var req = {
-			method: 'GET',
-			uri: 'https://api.twitch.tv/kraken/chat/emoticons',
-			headers:{'Client-ID': this.client_id, 'Content-Type': 'application/json'},
-	};
-	var rqst = request(req, function (error, response, body) {
-		console.log('error:', error);
-		console.log('statusCode:', response && response.statusCode);
-		console.log('body:', body);
-	});
-	console.log(rqst.body);
-	//var json_emotes = JSON.parse(rqst);
-	//console.log(json_emotes);
+	var json_emotes = this.getTwitchEmotes();
+	if(json_emotes !== null){
+		console.log(json_emotes);
+	}
+	else {
+		console.log("NULL");
+	}
 };
 
 botAna.prototype.onError = function onError(message) {
@@ -156,3 +151,34 @@ botAna.prototype.parseMessage = function parseMessage(rawMessage) {
 	}
 	return parsedMessage;
 };
+
+botAna.prototype.getTwitchEmotes = function getTwitchEmotes(){
+	/*const Http = new XMLHttpRequest();
+	const url='https://api.twitch.tv/kraken/chat/emoticons';
+	Http.open("GET", url, false);
+	Http.setRequestHeader('Client-ID', this.client_id);
+	Http.setRequestHeader('Accept', 'application/vnd.twitchtv.v5+json')
+	Http.setRequestHeader('Content-Type', 'application/json')
+	Http.send();
+
+	console.log('Twitch emotes retrieved.');
+	console.log(JSON.parse(Http.responseText));*/
+
+	var options = {
+		method: 'GET',
+		//rejectUnauthorized: false,
+		url: "https://api.twitch.tv/kraken/chat/emoticons",
+		headers: {
+			"Client-ID": this.client_id,
+			"Content-Type": "application/json",
+			"Accept": "application/vnd.twitchtv.v5+json"
+		}
+	};
+	var r = request(options, function(error, response, body){
+		if(response.statusCode === 200){
+			//console.log(JSON.parse(body));
+			return JSON.parse(body);
+		}
+	});
+	return null;
+}

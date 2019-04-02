@@ -1,5 +1,12 @@
-body {
-	background-color:green;/*#ede7f6;*/
+html {
+	font-size: 13px;
+}
+
+.body-content {
+	margin-top: 5px;
+	margin-bottom: 5px;
+	margin-right: 5px;
+	margin-left: 5px;
 }
 
 .message_time {
