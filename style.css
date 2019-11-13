@@ -9,6 +9,40 @@ html {
 	margin-left: 5px;
 }
 
+#message-window {
+	overflow-y: auto;
+	height: 99%;
+}
+
+.input-list{
+	display: flex;
+	bottom: 0;
+}
+
+#content_input {
+	min-width: 10%
+}
+
+.form-group {
+    margin-right: 0.2rem;
+}
+
+.form-control:focus {
+    background-color: #fff !important;
+    border-color: #b39cd2 !important;
+    box-shadow: 0 0 0 0.1rem #b39cd2 !important;
+}
+
+#send-msg-btn {
+	background-color: #815fc0;
+	border-color: #815fc0;
+}
+
+#send-msg-btn:hover {
+	background-color: #503484;
+	border-color: #503484;	
+}
+
 .message_time {
 	color: #9e9e9e;
 }

@@ -1,5 +1,6 @@
 const utilities = require('./utilities.js');
 var request = require('request');
+window.$ = window.jQuery = require('jquery');
 
 var parsed;
 var user = {
@@ -7,8 +8,8 @@ var user = {
 	color: null,
 	display_name: null,
 	emotes: null,
-	mod: false, //default
-	subscriber: false, //default
+	mod: false, 			//default
+	subscriber: false, 		//default
 	user_id: null,
 	message: null
 };
@@ -32,6 +33,7 @@ botAna.prototype.open = function open() {
 	this.webSocket.onclose = this.onClose.bind(this);
 	this.webSocket.onopen = this.onOpen.bind(this);
 
+	/*
 	var json_emotes = this.getTwitchEmotes();
 	if(json_emotes !== null){
 		console.log(json_emotes);
@@ -39,8 +41,15 @@ botAna.prototype.open = function open() {
 	else {
 		console.log("NULL");
 	}
+	*/
 };
 
+botAna.prototype.onReady = function onReady(){
+	$("#input-frm").on("submit", function(e){
+		e.preventDefault();
+		
+	})
+}
 botAna.prototype.onError = function onError(message) {
 	console.log('Error: ' + message);
 };
@@ -51,19 +60,23 @@ botAna.prototype.onMessage = function onMessage(message) {
 		if (parsed !== null) {
 			if (parsed.command === "PING") {
 				this.webSocket.send("PONG :" + parsed.message);
-				console.log("PONG")
+				console.log("["+utilities.get_current_time()+"] Received PING from twitch.tv, sent PONG")
 			} else {
 				if (parsed.message !== null) {
 					if (parsed.username.includes("NOTICE")) {
-						//console.log("NOTICE");
+						console.log("["+utilities.get_current_time()+"] Received a NOTICE from twitch.tv");
 					} else {
 						if (!(parsed.message.includes("GLOBALUSERSTATE")) && !(parsed.message.includes("USERSTATE")) && !(parsed.message.includes("ROOMSTATE"))) {
 							user["username"] = parsed.username;
 							user["message"] = parsed.message;
 
-							this.parseInfos(parsed.tags)
-							$("#message_window").append("<div><span class=message_time>" + utilities.get_current_time() + "</span> <strong><span style=color:"+user["color"]+">" + user["username"] + "</strong></span>: " + parsed["message"] + "</div>");
+							this.parseInfos(parsed.tags);
+							console.log(parsed.tags);
+
+							$("#message-window").append("<div><span class=message_time>" + utilities.get_current_time() + "</span> <strong><span style=color:"+user["color"]+">" + user["username"] + "</strong></span>: " + parsed["message"] + "</div>");
+							utilities.scroll_to_bottom();
 						}
+						/*	First command, this is staying here for ever	*/
 						if (parsed.message.includes("monkaS")) {
 							this.sendMessage("monkaS")
 						}
@@ -71,8 +84,7 @@ botAna.prototype.onMessage = function onMessage(message) {
 				}
 			}
 		}
-		var objDiv = document.getElementById("message_window");
-		objDiv.scrollTop = objDiv.scrollHeight;
+		utilities.scroll_to_bottom();
 	}
 };
 
@@ -106,10 +118,10 @@ botAna.prototype.parseInfos = function parseInfos(tags) {
 	//user-id=1337;
 	//user-type=global_mod
 	var infos = tags.split(';');
-	user["color"] = infos[1].split('=')[1]
-	user["mod"] = infos[4].split('=')[1]
-	user["subscriber"] = infos[6].split('=')[1]
-	user["user_id"] = infos[8].split('=')[1]
+	user["color"] = infos[2].split('=')[1]
+	user["mod"] = infos[7].split('=')[1]
+	user["subscriber"] = infos[9].split('=')[1]
+	user["user_id"] = infos[12].split('=')[1]
 };
 
 botAna.prototype.onClose = function onClose() {
@@ -176,8 +188,12 @@ botAna.prototype.getTwitchEmotes = function getTwitchEmotes(){
 	};
 	var r = request(options, function(error, response, body){
 		if(response.statusCode === 200){
-			//console.log(JSON.parse(body));
+
+			console.log(JSON.parse(body));
 			return JSON.parse(body);
+		}
+		else {
+			console.log("O SHIET")
 		}
 	});
 	return null;

@@ -9,7 +9,8 @@ function createWindow() {
 	win = new BrowserWindow({
 		width: 800,
 		height: 600,
-		webPreferences: false
+		webPreferences: false,
+		icon: '/media/main_icon.ico'
 	})
 
 	//Opens Developer Tools
@@ -37,3 +38,5 @@ app.on('activate', () => {
 		createWindow()
 	}
 })
+
+process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';

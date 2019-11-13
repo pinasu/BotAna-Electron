@@ -1,5 +1,5 @@
 {
-  "name": "test_botanajs",
+  "name": "botana",
   "version": "1.0.0",
   "description": "Pinasu's Twitch chatbot",
   "main": "main.js",
@@ -9,10 +9,10 @@
   "author": "Pinasu",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^3.0.0"
+    "electron": "^3.1.13"
   },
   "dependencies": {
-    "jquery": "^3.3.1",
+    "jquery": "^3.4.1",
     "request": "^2.88.0"
   },
   "repository": {
