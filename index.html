@@ -3,6 +3,9 @@
 
 <head>
 	<meta charset="utf-8">
+	
+	<!-- Content Security Policy -->
+	<meta http-equiv="Content-Security-Policy" content="script-src 'unsafe-inline' 'self' https://code.jquery.com/ https://cdnjs.cloudflare.com/ https://stackpath.bootstrapcdn.com/">
 
 	<script src="botAna.js"></script>
 
@@ -16,23 +19,25 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 
-	<title>BotAna</title>
+	<title>BotAna 3.0 (Beta)</title>
 
 </head>
 
 <body class="body-content">
+
 	<div id="message-window">
-		<span style="color:#9e9e9e">Connesso al canale. Benvenuto!</span>
+		<span>Connesso al canale. Benvenuto!</span>
 	</div>
-	<div>
-		<form id="input-frm" class="input-list">
+
+	<div id="input-container">
+		<div id="input-frm" class="input-list">
 			<div class="form-group">
-				<input type="input" class="form-control" id="content_input" placeholder="Invia un messaggio"></small>
+				<input type="input" class="form-control" id="content_input" placeholder="Invia un messaggio"></input>
 			</div>
 			<div>
 				<button type="button" class="btn btn-primary" id="send-msg-btn">Chat</button>
 			</div>
-		</form>
+		</div>
 	</div>	
 	<script>
 		$(document).ready(function() {
@@ -46,11 +51,33 @@
 		var CONFIG = require('./config.json');
 
 		window.botAna = new botAna({
-			channel: "#" + CONFIG.nick,
-			username: '' + CONFIG.bot_name,
-			password: '' + CONFIG.bot_oauth,
-			client_id: '' + CONFIG.client_id
+			channel: 			'#' + CONFIG.nick,
+			username: 			'' 	+ CONFIG.bot_name,
+			display_username: 	'' 	+ CONFIG.display_username,
+			password: 			'' 	+ CONFIG.bot_oauth,
+			client_id: 			'' 	+ CONFIG.client_id
 		});
+
+		$('#content_input').keypress(function(event){
+	    	var keycode = (event.keyCode ? event.keyCode : event.which);
+	    	//	Enter
+		    if(keycode == '13'){
+				var input_value = $('#content_input').val();
+				if(input_value != ''){
+					window.botAna.sendMessage(input_value);
+					$('#content_input').val('');
+				}
+		    }
+		});
+
+		$('#send-msg-btn').click(function(event){
+			var input_value = $('#content_input').val();
+			if(input_value != ''){
+				window.botAna.sendMessage(input_value);
+				$('#content_input').val('');
+			}
+		});
+
 	</script>
 
 </body>

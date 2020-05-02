@@ -38,5 +38,3 @@ app.on('activate', () => {
 		createWindow()
 	}
 })
-
-process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
