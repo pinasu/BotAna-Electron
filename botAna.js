@@ -12,7 +12,8 @@ var user = {
 	subscriber: 	null, 
 	user_id: 		null,
 	message: 		null,
-	msg_ts: 		null
+	msg_ts: 		null,
+	broadcaster:    null
 };
 
 var botAna = function botAna(options) {
@@ -53,7 +54,7 @@ botAna.prototype.onReady = function onReady(){
 	})
 }
 botAna.prototype.onError = function onError(message) {
-	console.log('Error: ' + message);
+	console.error('Error: ' + message);
 };
 
 botAna.prototype.onMessage = function onMessage(message) {
@@ -62,11 +63,11 @@ botAna.prototype.onMessage = function onMessage(message) {
 		if (parsed !== null) {
 			if (parsed.command === "PING") {
 				this.webSocket.send("PONG :" + parsed.message);
-				console.log("["+utilities.get_current_time(user["msg_ts"])+"] Received PING from twitch.tv, sent PONG")
+				console.warn("["+utilities.get_current_time(new Date().getTime())+"] Received PING from twitch.tv, sent PONG")
 			} else {
 				if (parsed.message !== null) {
 					if (parsed.username.includes("NOTICE")) {
-						console.log("["+utilities.get_current_time()+"] Received a NOTICE from twitch.tv");
+						console.warn("["+utilities.get_current_time(new Date().getTime())+"] Received a NOTICE from twitch.tv");
 					} else {
 						if (!(parsed.message.includes("GLOBALUSERSTATE")) && !(parsed.message.includes("USERSTATE")) && !(parsed.message.includes("ROOMSTATE"))) {
 							user["username"] 	= parsed.username;
@@ -76,15 +77,25 @@ botAna.prototype.onMessage = function onMessage(message) {
 
 							var badgesList = [];
 
-							if(user["mod"] == "0"){
+							if(user["mod"] == "1"){
 								badgesList.push("mod");
-								$("#message-window").append(this.getMessageBadges(badgesList));
 							}
+
+							if(user["subscriber"] == "1"){
+								badgesList.push("sub");
+							}
+
+							if(user["broadcaster"] == "1"){
+								badgesList.push("broadcaster");
+							}
+
+							$("#message-window").append(this.getMessageBadges(badgesList));
+
 							utilities.scroll_to_bottom();
 						}
 						/*	First command, this is staying here for ever	*/
 						if (parsed.message.includes("monkaS")) {
-							this.sendMessage("monkaS")
+							this.sendMessage("monkaS");
 						}
 					}
 				}
@@ -109,7 +120,7 @@ botAna.prototype.onOpen = function onOpen() {
 
 botAna.prototype.sendMessage = function sendMessage(message) {
 	this.webSocket.send("PRIVMSG " + this.channel + " :" + message)
-	$("#message-window").append("<div><span class=message_time>" + utilities.get_current_time(new Date().getTime()) + "</span> <strong><span style=color:rgb(0,0,255)>" + this.display_username + "</strong></span>: " + message + "</div>");
+	$("#message-window").append("<div><span class=message_time>" + utilities.get_current_time(new Date().getTime()) + "</span><img src='res/images/twitch/badges/badge_botana.png'><strong><span style=color:rgb(0,0,255)>" + this.display_username + "</strong></span>: " + message + "</div>");
 };
 
 botAna.prototype.parseInfos = function parseInfos(tags) {
@@ -127,13 +138,22 @@ botAna.prototype.parseInfos = function parseInfos(tags) {
 	//[11]	turbo=0;
 	//[12]	user-id=119261099;
 	//[13]	user-type=mod
-	var infos 			= tags.split(';');
-	user["color"] 		= infos[2].split('=')[1];
-	user["username"] 	= infos[3].split('=')[1];
-	user["mod"] 		= infos[7].split('=')[1];
-	user["subscriber"] 	= infos[9].split('=')[1];
-	user["msg_ts"]		= infos[10].split('=')[1];
-	user["user_id"] 	= infos[12].split('=')[1];
+
+	var infos 				= tags.split(';');
+	user["color"] 			= infos[2].split('=')[1];
+	user["username"] 		= infos[3].split('=')[1];
+	user["mod"] 			= infos[7].split('=')[1];
+	user["subscriber"] 		= infos[9].split('=')[1];
+	user["msg_ts"]			= infos[10].split('=')[1];
+	user["user_id"] 		= infos[12].split('=')[1];
+
+	var badges = infos[1].split('=')[1];
+	if(badges.includes("broadcaster/1")){
+		user["broadcaster"] = "1";
+	}
+	else {
+		user["broadcaster"] = "0";
+	}
 };
 
 botAna.prototype.onClose = function onClose() {
@@ -170,7 +190,8 @@ botAna.prototype.parseMessage = function parseMessage(rawMessage) {
 		parsedMessage.command 	= rawMessage.slice(userIndex + 1, commandIndex);
 		parsedMessage.channel 	= rawMessage.slice(commandIndex + 1, channelIndex);
 		parsedMessage.message 	= rawMessage.slice(messageIndex + 1);
-	} else if (rawMessage.startsWith("PING")) {
+	} 
+	else if (rawMessage.startsWith("PING")) {
 		parsedMessage.command 	= "PING";
 		parsedMessage.message 	= rawMessage.split(":")[1];
 	}
@@ -179,9 +200,16 @@ botAna.prototype.parseMessage = function parseMessage(rawMessage) {
 
 botAna.prototype.getMessageBadges = function getMessageBadges(badgesList){
 	var ret = "<div><span class=message_time>" + utilities.get_current_time(user["msg_ts"]) + "</span>";
+
 	for(var i=0; i<badgesList.length; i++){
 		if(badgesList[i] == "mod"){
-			ret += "<img src='res/images/twitch/badges/mod_sword.png'</img>";
+			ret += "<img src='res/images/twitch/badges/mod_sword.png'>";
+		}
+		if(badgesList[i] == "broadcaster"){
+			ret += "<img src='res/images/twitch/badges/broadcaster.png'>";
+		}
+		if(badgesList[i] == "sub"){
+			ret += "<img src='res/images/twitch/badges/sub_badge.png>";
 		}
 	}
 	return ret += "<strong><span style='color:"+user["color"]+"''>" + user["username"] + "</strong></span>: " + parsed["message"] +"</div>";
