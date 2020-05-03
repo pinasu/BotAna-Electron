@@ -69,12 +69,17 @@ botAna.prototype.onMessage = function onMessage(message) {
 						console.log("["+utilities.get_current_time()+"] Received a NOTICE from twitch.tv");
 					} else {
 						if (!(parsed.message.includes("GLOBALUSERSTATE")) && !(parsed.message.includes("USERSTATE")) && !(parsed.message.includes("ROOMSTATE"))) {
-							user["username"] = parsed.username;
-							user["message"] = parsed.message;
+							user["username"] 	= parsed.username;
+							user["message"] 	= parsed.message;
 
 							this.parseInfos(parsed.tags);
 
-							$("#message-window").append("<div><span class=message_time>" + utilities.get_current_time(user["msg_ts"]) + "</span> <strong><span style=color:"+user["color"]+">" + user["username"] + "</strong></span>: " + parsed["message"] + "</div>");
+							var badgesList = [];
+
+							if(user["mod"] == "0"){
+								badgesList.push("mod");
+								$("#message-window").append(this.getMessageBadges(badgesList));
+							}
 							utilities.scroll_to_bottom();
 						}
 						/*	First command, this is staying here for ever	*/
@@ -171,6 +176,16 @@ botAna.prototype.parseMessage = function parseMessage(rawMessage) {
 	}
 	return parsedMessage;
 };
+
+botAna.prototype.getMessageBadges = function getMessageBadges(badgesList){
+	var ret = "<div><span class=message_time>" + utilities.get_current_time(user["msg_ts"]) + "</span>";
+	for(var i=0; i<badgesList.length; i++){
+		if(badgesList[i] == "mod"){
+			ret += "<img src='res/images/twitch/badges/mod_sword.png'</img>";
+		}
+	}
+	return ret += "<strong><span style='color:"+user["color"]+"''>" + user["username"] + "</strong></span>: " + parsed["message"] +"</div>";
+}
 
 botAna.prototype.getTwitchEmotes = function getTwitchEmotes(){
 	/*const Http = new XMLHttpRequest();
