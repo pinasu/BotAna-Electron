@@ -1,7 +1,11 @@
+
 const {
 	app,
 	BrowserWindow
 } = require('electron')
+
+
+const path = require("path");
 
 let win
 
@@ -22,7 +26,7 @@ function createWindow() {
 
 	win.on('closed', () => {
 		win = null
-	})
+	})	
 }
 
 app.on('ready', createWindow)

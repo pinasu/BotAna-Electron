@@ -9,11 +9,13 @@
   "author": "Pinasu",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^3.1.13"
+    "electron": "^3.1.13",
+    "electron-rebuild": "^1.10.1"
   },
   "dependencies": {
     "jquery": "^3.4.1",
-    "request": "^2.88.0"
+    "request": "^2.88.0",
+    "sqlite3": "^4.2.0"
   },
   "repository": {
     "type": "git",

@@ -1,6 +1,13 @@
 const utilities = require('./utilities.js');
-var request = require('request');
-window.$ = window.jQuery = require('jquery');
+var request 	= require('request');
+window.$ 		= window.jQuery = require('jquery');
+
+const sqlite3 = require('sqlite3').verbose();
+var db;
+
+const fs = require('fs');
+
+var current_command = {};
 
 var parsed;
 var user = {
@@ -50,11 +57,16 @@ botAna.prototype.open = function open() {
 botAna.prototype.onReady = function onReady(){
 	$("#input-frm").on("submit", function(e){
 		e.preventDefault();
-		
 	})
 }
 botAna.prototype.onError = function onError(message) {
 	console.error('Error: ' + message);
+};
+
+function setCommand(command){
+	current_command = command;
+	//This works
+	console.log(current_command);
 };
 
 botAna.prototype.onMessage = function onMessage(message) {
@@ -70,6 +82,8 @@ botAna.prototype.onMessage = function onMessage(message) {
 						console.warn("["+utilities.get_current_time(new Date().getTime())+"] Received a NOTICE from twitch.tv");
 					} else {
 						if (!(parsed.message.includes("GLOBALUSERSTATE")) && !(parsed.message.includes("USERSTATE")) && !(parsed.message.includes("ROOMSTATE"))) {
+							//current_command = {};
+							
 							user["username"] 	= parsed.username;
 							user["message"] 	= parsed.message;
 
@@ -92,10 +106,15 @@ botAna.prototype.onMessage = function onMessage(message) {
 							$("#message-window").append(this.getMessageBadges(badgesList));
 
 							utilities.scroll_to_bottom();
-						}
-						/*	First command, this is staying here for ever	*/
-						if (parsed.message.includes("monkaS")) {
-							this.sendMessage("monkaS");
+							
+							/*	First command, this is staying here for ever	*/
+							if (parsed.message.includes("monkaS")) {
+								this.sendMessage("monkaS");
+							}
+
+							this.getCommand(parsed.message.replace(/\r?\n|\r/g, ""), setCommand);
+							console.log(current_command["response"]);
+
 						}
 					}
 				}
@@ -106,6 +125,11 @@ botAna.prototype.onMessage = function onMessage(message) {
 };
 
 botAna.prototype.onOpen = function onOpen() {
+
+	/*	Database	*/
+	db = new sqlite3.Database('BotAna.db');
+
+	/*	Twitch connection	*/
 	var socket = this.webSocket;
 
 	if (socket !== null && socket.readyState === 1) {
@@ -164,6 +188,8 @@ botAna.prototype.close = function close() {
 	if (this.webSocket){
 		this.webSocket.close();
 	}
+
+	db.close();
 };
 
 botAna.prototype.parseMessage = function parseMessage(rawMessage) {
@@ -213,7 +239,22 @@ botAna.prototype.getMessageBadges = function getMessageBadges(badgesList){
 		}
 	}
 	return ret += "<strong><span style='color:"+user["color"]+"''>" + user["username"] + "</strong></span>: " + parsed["message"] +"</div>";
-}
+};
+
+botAna.prototype.getCommand = function getCommand(command, callback){
+	var query = "SELECT * FROM commands WHERE name=\"" + command + "\"";
+
+	db.each(query, function (err, row) {
+		if(err){
+			console.error(err);
+		}
+		else{
+			console.log("Found command " + row["name"]);
+			callback(row);
+		}
+	});	
+};
+
 
 botAna.prototype.getTwitchEmotes = function getTwitchEmotes(){
 	/*const Http = new XMLHttpRequest();
@@ -248,4 +289,4 @@ botAna.prototype.getTwitchEmotes = function getTwitchEmotes(){
 		}
 	});
 	return null;
-}
+};
