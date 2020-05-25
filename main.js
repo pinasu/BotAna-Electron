@@ -4,8 +4,8 @@ const {
 	BrowserWindow
 } = require('electron')
 
-
-const path = require("path");
+const upath = require('upath');
+const icon_app = upath.join(__dirname, "res", "images", "main_icon.ico");
 
 let win
 
@@ -13,8 +13,10 @@ function createWindow() {
 	win = new BrowserWindow({
 		width: 800,
 		height: 600,
-		webPreferences: false,
-		icon: '/media/main_icon.ico'
+        webPreferences: {
+            nodeIntegration: true
+        },
+		icon: icon_app
 	})
 
 	//Opens Developer Tools

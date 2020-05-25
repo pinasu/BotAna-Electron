@@ -2,10 +2,10 @@ const utilities = require('./utilities.js');
 var request 	= require('request');
 window.$ 		= window.jQuery = require('jquery');
 
-const sqlite3 = require('sqlite3').verbose();
-var db;
-
 const fs = require('fs');
+
+const db   = require('electron-db');
+const path = require("path");
 
 var current_command = {};
 
@@ -112,8 +112,8 @@ botAna.prototype.onMessage = function onMessage(message) {
 								this.sendMessage("monkaS");
 							}
 
-							this.getCommand(parsed.message.replace(/\r?\n|\r/g, ""), setCommand);
-							console.log(current_command["response"]);
+							this.getCommand(parsed.message.replace(/\r?\n|\r/g, ""));
+							this.sendMessage(current_command["response"]);
 
 						}
 					}
@@ -126,8 +126,19 @@ botAna.prototype.onMessage = function onMessage(message) {
 
 botAna.prototype.onOpen = function onOpen() {
 
-	/*	Database	*/
-	db = new sqlite3.Database('BotAna.db');
+	var location = path.join(__dirname, '')
+
+	/*	Database commands	*/
+	if (!fs.existsSync('./commands.json')) {
+		db.createTable('commands', location, (succ, msg) => {
+			if (succ) {
+				console.log(msg);
+			} 
+			else {
+				console.error(msg);
+			}
+		});
+	}
 
 	/*	Twitch connection	*/
 	var socket = this.webSocket;
@@ -144,7 +155,11 @@ botAna.prototype.onOpen = function onOpen() {
 
 botAna.prototype.sendMessage = function sendMessage(message) {
 	this.webSocket.send("PRIVMSG " + this.channel + " :" + message)
-	$("#message-window").append("<div><span class=message_time>" + utilities.get_current_time(new Date().getTime()) + "</span><img src='res/images/twitch/badges/badge_botana.png'><strong><span style=color:rgb(0,0,255)>" + this.display_username + "</strong></span>: " + message + "</div>");
+	var msg_html = "<div><span class=message_time>" + utilities.get_current_time(new Date().getTime()) + "</span><img src='res/images/twitch/badges/badge_botana.png'><strong><span style=color:rgb(0,0,255)>" + this.display_username + "</strong></span>: " + message + "</div>";
+	
+	msg_html.replace(/(https?:\/\/.+?)(?:\s|$)/ig, '<a href="$1">$1</a>');
+
+	$("#message-window").append(msg_html);
 };
 
 botAna.prototype.parseInfos = function parseInfos(tags) {
@@ -188,8 +203,6 @@ botAna.prototype.close = function close() {
 	if (this.webSocket){
 		this.webSocket.close();
 	}
-
-	db.close();
 };
 
 botAna.prototype.parseMessage = function parseMessage(rawMessage) {
@@ -241,20 +254,37 @@ botAna.prototype.getMessageBadges = function getMessageBadges(badgesList){
 	return ret += "<strong><span style='color:"+user["color"]+"''>" + user["username"] + "</strong></span>: " + parsed["message"] +"</div>";
 };
 
-botAna.prototype.getCommand = function getCommand(command, callback){
-	var query = "SELECT * FROM commands WHERE name=\"" + command + "\"";
+botAna.prototype.getCommand = function getCommand(command){
+	var location = path.join(__dirname, '');
 
-	db.each(query, function (err, row) {
-		if(err){
-			console.error(err);
+	db.search('commands', location, 'name', command, (succ, data) => {
+		if (succ) {
+			current_command = data[0];
 		}
-		else{
-			console.log("Found command " + row["name"]);
-			callback(row);
+		else {
+			console.error(data);
 		}
-	});	
+	});
 };
 
+botAna.prototype.addCommand = function addCommand(cmd, resp){
+	var location = path.join(__dirname, '')
+
+	let command 		= new Object();
+	command.name 		= cmd;
+	command.response 	= resp; 
+
+	console.log(command.name, command.response)
+
+	db.insertTableContent('commands', location, command, (succ, msg) => {
+		if(succ) {
+			console.log("Success: " + msg);
+		}
+		else {
+			console.alert("Errore nell'aggiunta del comando: " + msg)
+		}
+    })
+};
 
 botAna.prototype.getTwitchEmotes = function getTwitchEmotes(){
 	/*const Http = new XMLHttpRequest();

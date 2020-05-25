@@ -1,0 +1,9 @@
+{
+  "commands": [
+    {
+      "name": "!git",
+      "response": "Il codice sorgente di BotAna è reperibile su GitHub: https://github.com/pinasu/BotAna-Electron/",
+      "id": 1590400760469
+    }
+  ]
+}
